@@ -1,9 +1,7 @@
 version: '2'
 services:
   app:
-    build:
-      context: ./docker
-      dockerfile: Dockerfile
+    image: lkmadushan/nginx-php-alpine
     volumes:
       - .:/var/www/html
     ports:
