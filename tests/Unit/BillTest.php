@@ -86,7 +86,7 @@ class BillTest extends TestCase
     /**
      * @test
      */
-    public function it_calculates_each_users_bill_spent_amount()
+    public function it_calculates_each_users_total_expense()
     {
         $expected = [
             'tanu' => 50,
@@ -94,69 +94,46 @@ class BillTest extends TestCase
             'liam' => 100
         ];
 
-        $this->assertEquals($expected, (new Bill($this->dataSet))->spentByUsers());
+        $this->assertEquals($expected, (new Bill($this->dataSet))->expenseByUsers());
     }
 
     /**
      * @test
      */
-    public function it_calculates_each_users_share_of_bill()
+    public function it_calculates_due_amount_of_each_users()
     {
         $expected = [
-            'tanu' => 91.66,
-            'kasun' => 58.33,
-            'liam' => 99.99,
+            'tanu' => 83.33,
+            'kasun' => 25,
+            'liam' => 33.33
         ];
 
-        $this->assertEquals($expected, (new Bill($this->dataSet))->shareByUsers());
+        $this->assertEquals($expected, (new Bill($this->dataSet))->dueByUsers());
     }
 
     /**
      * @test
      */
-    public function it_calculates_each_user_diff_amount()
+    public function it_calsulates_settlement_of_each_friends()
     {
         $expected = [
-            'tanu' => -41.66,
-            'kasun' => 41.67,
-            'liam' => 0.01,
-        ];
-
-        $this->assertEquals($expected, (new Bill($this->dataSet))->diffByUsers());
-    }
-
-    /**
-     * @test
-     */
-    public function it_calculates_each_user_owe_amount()
-    {
-        $expected = [
-            'tanu' => -41.66,
-        ];
-
-        $this->assertEquals($expected, (new Bill($this->dataSet))->oweByUsers());
-    }
-
-    /**
-     * @test
-     */
-    public function it_calculates_each_user_additional_paid_amount()
-    {
-        $expected = [
-            'kasun' => 41.67,
-            'liam' => 0.01,
-        ];
-
-        $this->assertEquals($expected, (new Bill($this->dataSet))->additionalByUsers());
-    }
-
-    /**
-     * @test
-     */
-    public function it_calculates_settlement_combination()
-    {
-        $expected = [
-            'tanu->kasun' => 41.66,
+            'tanu' => [],
+            'kasun' => [
+                [
+                    'from' => 'tanu',
+                    'amount' => 58.33
+                ],
+                [
+                    'from' => 'liam',
+                    'amount' => 8.33
+                ]
+            ],
+            'liam' => [
+                [
+                    'from' => 'tanu',
+                    'amount' => 50,
+                ]
+            ]
         ];
 
         $this->assertEquals($expected, (new Bill($this->dataSet))->settlement());

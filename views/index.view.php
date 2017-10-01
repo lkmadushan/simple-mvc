@@ -3,7 +3,7 @@
 <?php require('partials/form.php'); ?>
 
 <?php if (isset($bill)): ?>
-<section class="section is-paddingless">
+<section style="margin-bottom: 50px" class="section is-paddingless">
     <div class="container">
         <div class="card">
             <header class="card-header">
@@ -19,14 +19,14 @@
                     <span class="icon is-small">
                         <i class="fa fa-money"></i>
                     </span>
-                    Total amount spent by all friend: <?php echo $bill->total() ?>
+                    Total amount of the bill: <?php echo $bill->total() ?>
                     <br>
                     <span class="icon is-small">
                         <i class="fa fa-users"></i>
                     </span>
-                    How much each friend has spent:
+                    Total expense amount by each friend:
                     <ul>
-                        <?php foreach ($bill->spentByUsers() as $user => $value): ?>
+                        <?php foreach ($bill->expenseByUsers() as $user => $value): ?>
                             <li><?php echo $user ?> : <?php echo $value ?></li>
                         <?php endforeach; ?>
                     </ul>
@@ -34,19 +34,9 @@
                     <span class="icon is-small">
                         <i class="fa fa-users"></i>
                     </span>
-                    How much each friend should share:
+                    Due amount by each friend:
                     <ul>
-                        <?php foreach ($bill->shareByUsers() as $user => $value): ?>
-                            <li><?php echo $user ?> : <?php echo $value ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <br>
-                    <span class="icon is-small">
-                        <i class="fa fa-users"></i>
-                    </span>
-                    How much each friend owes:
-                    <ul>
-                        <?php foreach ($bill->oweByUsers() as $user => $value): ?>
+                        <?php foreach ($bill->dueByUsers() as $user => $value): ?>
                             <li><?php echo $user ?> : <?php echo $value ?></li>
                         <?php endforeach; ?>
                     </ul>
@@ -56,8 +46,15 @@
                     </span>
                     Settlement combination:
                     <ul>
-                        <?php foreach ($bill->settlement() as $user => $value): ?>
-                            <li><?php echo $user ?> : <?php echo $value ?></li>
+                        <?php foreach ($bill->settlement() as $user => $settlements): ?>
+                            <li>
+                                <dl><?php echo $user ?> :</dl>
+                                <?php foreach ($settlements as $settlement): ?>
+                                    <dt>from - <?php echo $settlement['from'] ?></dt>
+                                    <dt>amount <?php echo $settlement['amount'] ?></dt>
+                                    <br>
+                                <?php endforeach; ?>
+                            </li>
                         <?php endforeach; ?>
                     </ul>
                 </div>

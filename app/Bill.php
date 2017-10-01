@@ -86,116 +86,84 @@ class Bill
     }
 
     /**
-     * Bill amounts spent by each users
+     * Total expense amount by each user
      *
      * @return array
      */
-    public function spentByUsers()
+    public function expenseByUsers()
     {
-        $spent = [];
+        $expense = [];
 
         foreach ($this->data as $item) {
             $user = $item['paid_by'];
 
-            $spent[$user] = isset($spent[$user])
-                ? $spent[$user] + $item['amount']
+            $expense[$user] = isset($expense[$user])
+                ? $expense[$user] + $item['amount']
                 : $item['amount'];
         }
 
-        return $spent;
+        return $expense;
     }
 
     /**
-     * Each user share of the bill
-     *
+     * Due amount of the each user
+     * 
      * @return array
      */
-    public function shareByUsers()
+    public function dueByUsers()
     {
-        $shares = [];
+        $due = [];
 
         foreach ($this->data as $item) {
-            $amount = round(
-                $item['amount'] / count($item['friends']), 2
-            );
+            $users = array_unique($item['friends']);
+            $share = round($item['amount'] / count($users), 2);
 
-            foreach ($item['friends'] as $friend) {
-                $shares[$friend] = isset($shares[$friend])
-                    ? $shares[$friend] + $amount
-                    : $amount;
+            array_splice($users, array_search($item['paid_by'], $users), 1);
+
+            foreach ($users as $user) {
+                $due[$user] = isset($due[$user])
+                    ? $due[$user] + $share
+                    : $share;
             }
         }
 
-        return $shares;
+        return $due;
     }
 
     /**
-     * Each user difference amount
-     *
-     * @return array
-     */
-    public function diffByUsers()
-    {
-        $diff = [];
-
-        foreach ($this->spentByUsers() as $name => $amount) {
-            $diff[$name] = $amount - $this->shareByUsers()[$name];
-        }
-
-        return $diff;
-    }
-
-    /**
-     * Each user owe amount
-     *
-     * @return array
-     */
-    public function oweByUsers()
-    {
-        $owe = [];
-
-        foreach ($this->diffByUsers() as $name => $amount) {
-            if ($amount < 0) {
-                $owe[$name] = $amount;
-            }
-        }
-
-        return $owe;
-    }
-
-    /**
-     * @return array
-     */
-    public function additionalByUsers()
-    {
-        return array_diff($this->diffByUsers(), $this->oweByUsers());
-    }
-
-    /**
-     * Settlement combination
-     *
+     * Settlement of each user
+     * 
      * @return array
      */
     public function settlement()
     {
-        $settlement = [];
+        $settlements = [];
 
-        foreach ($this->oweByUsers() as $name => $oweAmount) {
-            $payable = abs($oweAmount);
+        $users = $this->users();
+        $dueUsers = $this->dueByUsers();
 
-            foreach ($addPaid = $this->additionalByUsers() as $addName => $addAmount) {
-                if ($addAmount >= $payable) {
-                    $settlement["{$name}->{$addName}"] = $payable;
-                    $addPaid[$addName] = $addAmount - $payable;
-                    break;
-                } else {
-                    $settlement["{$name}->{$addName}"] = $addAmount;
-                    $payable = $payable - $addAmount;
+        foreach ($users as $creditor) {
+            $settlements[$creditor] = [];
+
+            foreach ($dueUsers as $debtor => $due) {
+                if ($creditor == $debtor) {
+                    continue;
                 }
+
+                if ($dueUsers[$creditor] > $due) {
+                    continue;
+                }
+
+                $owe = [
+                    'from' => $debtor,
+                    'amount' => $due - $dueUsers[$creditor]
+                ];
+
+                array_push($settlements[$creditor], $owe);
             }
         }
 
-        return $settlement;
+        return $settlements;
     }
 
     /**
