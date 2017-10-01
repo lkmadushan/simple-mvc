@@ -115,10 +115,11 @@ class Bill
         $due = [];
 
         foreach ($this->data as $item) {
-            $users = array_unique($item['friends']);
-            $share = round($item['amount'] / count($users), 2);
+            $share = round($item['amount'] / count($item['friends']), 2);
 
-            array_splice($users, array_search($item['paid_by'], $users), 1);
+            $users = array_filter($item['friends'], function ($friend) use ($item) {
+                return $friend != $item['paid_by'];
+            });
 
             foreach ($users as $user) {
                 $due[$user] = isset($due[$user])

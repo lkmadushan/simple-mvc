@@ -103,7 +103,7 @@ class BillTest extends TestCase
     public function it_calculates_due_amount_of_each_users()
     {
         $expected = [
-            'tanu' => 83.33,
+            'tanu' => 66.66,
             'kasun' => 25,
             'liam' => 33.33
         ];
@@ -121,7 +121,7 @@ class BillTest extends TestCase
             'kasun' => [
                 [
                     'from' => 'tanu',
-                    'amount' => 58.33
+                    'amount' => 41.66
                 ],
                 [
                     'from' => 'liam',
@@ -131,7 +131,7 @@ class BillTest extends TestCase
             'liam' => [
                 [
                     'from' => 'tanu',
-                    'amount' => 50,
+                    'amount' => 33.33,
                 ]
             ]
         ];
